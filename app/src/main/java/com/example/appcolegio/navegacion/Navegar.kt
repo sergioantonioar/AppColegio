@@ -6,31 +6,34 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
+import com.example.appcolegio.pantallas.AdicionarDocente
+import com.example.appcolegio.pantallas.ListaDocente
 
-data object Home
+data object ListDocente
+data object AddDocente
+
 data class Product(val id: String)
 
 @Composable
 fun Navegar() {
 
-    val backStack = remember { mutableStateListOf<Any>(Home) }
+    val backStack = remember { mutableStateListOf<Any>(ListDocente) }
 
     NavDisplay(
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
         entryProvider = { key ->
             when (key) {
-                is Home -> NavEntry(key) {
-
-                    backStack.add(Product("123"))
-
+                is ListDocente -> NavEntry(key) {
+                    ListaDocente(addDocente = {backStack.add(AddDocente)})
                 }
+
+                is AddDocente -> NavEntry(key) {
+                    AdicionarDocente(onBack = {backStack.removeLastOrNull()})
+                }
+
+                else -> NavEntry(Unit) { Text("Unknown route") }
             }
-
-            is Product -> NavEntry(key) {
-            //ContentBlue("Product ${key.id} ")
         }
-
-            else -> NavEntry(Unit) { Text("Unknown route") }
-        }
+    )
 }
