@@ -31,17 +31,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.appcolegio.local.AppDatabase
-import com.example.appcolegio.local.entidades.Docente
+import com.example.appcolegio.local.entidades.Curso
 import kotlinx.coroutines.launch
 
 
 //01:13:24
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AdicionarDocente(onBack: () -> Unit, db: AppDatabase) {
+fun AdicionarCurso(onBack: () -> Unit, db: AppDatabase) {
 
     //obtener el DAO
-    val dao = db.docenteDao()
+    val dao = db.cursoDao()
 
     //crear objeto de una corrutina
     val scope = rememberCoroutineScope()
@@ -49,13 +49,12 @@ fun AdicionarDocente(onBack: () -> Unit, db: AppDatabase) {
     //snackbar
     val snackbar=remember { SnackbarHostState() }
 
-    var nombres by remember { mutableStateOf("") }
-    var apellidos by remember { mutableStateOf("") }
-    val sexos = listOf("Masculino", "Femenino", "Otros")
-    var expanded by remember { mutableStateOf(false) }
-    var nomSexo by remember { mutableStateOf("") }
-    var sueldo by remember { mutableStateOf("") }
-    var hijos by remember { mutableStateOf("") }
+    var nombre by remember { mutableStateOf("") }
+    var ciclos = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+    var numCiclo by remember { mutableStateOf("") }
+    var expandedCiclo by remember { mutableStateOf(false) }
+    var numCred by remember { mutableStateOf("") }
+    var nomCarrera by remember { mutableStateOf("") }
 
     Scaffold(
         snackbarHost = {
@@ -63,7 +62,7 @@ fun AdicionarDocente(onBack: () -> Unit, db: AppDatabase) {
         },
         topBar = {
             TopAppBar(
-                title = { Text("Registrar Docente") },
+                title = { Text("Registrar Curso") },
                 navigationIcon = {
                     IconButton(
                         onClick = { onBack() }
@@ -83,35 +82,27 @@ fun AdicionarDocente(onBack: () -> Unit, db: AppDatabase) {
                 .padding(15.dp)
         ) {
             OutlinedTextField(
-                value = nombres,
-                onValueChange = { nombres = it },
-                label = { Text("Ingresar nombres") },
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-
-            OutlinedTextField(
-                value = apellidos,
-                onValueChange = { apellidos = it },
-                label = { Text("Ingresar apellidos") },
+                value = nombre,
+                onValueChange = { nombre = it },
+                label = { Text("Ingresar nombre") },
                 modifier = Modifier
                     .fillMaxWidth()
             )
 
             ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
+                expanded = expandedCiclo,
+                onExpandedChange = { expandedCiclo = !expandedCiclo },
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
 
                 OutlinedTextField(
-                    value = nomSexo,
+                    value = numCiclo,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("[Seleccione Sexo]") },
+                    label = { Text("[Seleccione ciclo]") },
                     trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+                        ExposedDropdownMenuDefaults.TrailingIcon(expandedCiclo)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -119,15 +110,15 @@ fun AdicionarDocente(onBack: () -> Unit, db: AppDatabase) {
                 )
 
                 ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    expanded = expandedCiclo,
+                    onDismissRequest = { expandedCiclo = false }
                 ) {
-                    sexos.forEach { item ->
+                    ciclos.forEach { item ->
                         DropdownMenuItem(
                             text = { Text(item) },
                             onClick = {
-                                nomSexo = item
-                                expanded = false
+                                numCiclo = item
+                                expandedCiclo = false
                             }
                         )
                     }
@@ -135,17 +126,17 @@ fun AdicionarDocente(onBack: () -> Unit, db: AppDatabase) {
             }
 
             OutlinedTextField(
-                value = sueldo,
-                onValueChange = { sueldo = it },
-                label = { Text("Ingresar sueldo") },
+                value = numCred,
+                onValueChange = { numCred = it },
+                label = { Text("Ingresar credito") },
                 modifier = Modifier
                     .fillMaxWidth()
             )
 
             OutlinedTextField(
-                value = hijos,
-                onValueChange = { hijos = it },
-                label = { Text("Ingresar hijos") },
+                value = nomCarrera,
+                onValueChange = { nomCarrera = it },
+                label = { Text("Ingresar carrera") },
                 modifier = Modifier
                     .fillMaxWidth()
             )
@@ -161,10 +152,9 @@ fun AdicionarDocente(onBack: () -> Unit, db: AppDatabase) {
                         scope.launch {
                             try {
                                 dao.registrar(
-                                    Docente(0,nombres,apellidos,
-                                        nomSexo,sueldo.toDouble(),hijos.toInt())
+                                    Curso(0,nombre, numCiclo, numCred, nomCarrera)
                                 )
-                                snackbar.showSnackbar("Docente registrado")
+                                snackbar.showSnackbar("Curso registrado")
                             }catch (e: Exception){
                                 snackbar.showSnackbar("Error> ${e.message}")
                             }

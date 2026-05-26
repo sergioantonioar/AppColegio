@@ -8,7 +8,7 @@ import com.example.appcolegio.local.entidades.Docente
 @Dao
 interface DocenteDao {
     @Query("select *from docente")
-    suspend fun listar(): List<Docente>
+    suspend fun listar(): List<Docente> //suspend indica que es asincrono
     @Insert
     suspend fun registrar(bean: Docente)
 }

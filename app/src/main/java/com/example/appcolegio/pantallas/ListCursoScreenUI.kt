@@ -32,23 +32,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import com.example.appcolegio.local.entidades.Curso
 import com.example.appcolegio.navegacion.MenuInferior
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListaDocente(
-    addDocente: () -> Unit,
-    //onDocente: () -> Unit,
-    onCurso: () -> Unit,
+fun ListaCurso(
+    addCurso: () -> Unit,
+    onDocente: () -> Unit,
     db: AppDatabase
 ) {
 
-    val dao = db.docenteDao()
+    val dao = db.cursoDao()
     val scope = rememberCoroutineScope()
 
     var lista by remember {
-        mutableStateOf(listOf<Docente>())
+        mutableStateOf(listOf<Curso>())
     }
 
     //para se ejecute una sola vez por el composable y no haga cuello de botella
@@ -61,7 +61,7 @@ fun ListaDocente(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Docente") },
+                title = { Text("Curso") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Blue,
                     titleContentColor = Color.White
@@ -71,14 +71,14 @@ fun ListaDocente(
         bottomBar = {
             BottomAppBar {
                 MenuInferior(
-                    onDocente = {},
-                    onCurso = {onCurso()}
+                    onCurso = {},
+                    onDocente = {onDocente()}
                 )
             }
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { addDocente() },
+                onClick = { addCurso() },
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -104,8 +104,7 @@ fun ListaDocente(
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Text("Codigo: ${bean.codigo}", fontWeight = FontWeight.Bold)
-                        Text("Nombres: ${bean.nombres}")
-                        Text("Apellidos: ${bean.apellidos}")
+                        Text("Nombres: ${bean.nombre}")
 
                     }
                 }

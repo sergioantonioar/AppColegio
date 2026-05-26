@@ -4,13 +4,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
+import androidx.room.Room
+import com.example.appcolegio.local.AppDatabase
+import com.example.appcolegio.local.entidades.Docente
+import com.example.appcolegio.pantallas.AdicionarCurso
 import com.example.appcolegio.pantallas.AdicionarDocente
+import com.example.appcolegio.pantallas.ListaCurso
 import com.example.appcolegio.pantallas.ListaDocente
 
 data object ListDocente
 data object AddDocente
+data object AddCurso
+data object ListCurso
 
 data class Product(val id: String)
 
@@ -18,6 +26,18 @@ data class Product(val id: String)
 fun Navegar() {
 
     val backStack = remember { mutableStateListOf<Any>(ListDocente) }
+    val context = LocalContext.current
+
+    /* crear bd */
+    val db = remember {
+        Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "colegio.db"
+        )
+            .fallbackToDestructiveMigration(true)
+            .build()
+    }
 
     NavDisplay(
         backStack = backStack,
@@ -25,11 +45,37 @@ fun Navegar() {
         entryProvider = { key ->
             when (key) {
                 is ListDocente -> NavEntry(key) {
-                    ListaDocente(addDocente = {backStack.add(AddDocente)})
+                    ListaDocente(
+                        addDocente = {
+                            backStack.add(AddDocente)
+                        },
+                        onCurso = {
+                            backStack.clear()
+                            backStack.add(ListCurso)
+                        },
+                        db = db
+                    )
+                }
+
+                is ListCurso -> NavEntry(key) {
+                    ListaCurso(
+                        addCurso = {
+                            backStack.add(AddCurso)
+                        },
+                        onDocente = {
+                            backStack.clear()
+                            backStack.add(ListDocente)
+                        },
+                        db = db
+                    )
+                }
+
+                is AddCurso -> NavEntry(key) {
+                    AdicionarCurso(onBack = { backStack.removeLastOrNull() }, db = db)
                 }
 
                 is AddDocente -> NavEntry(key) {
-                    AdicionarDocente(onBack = {backStack.removeLastOrNull()})
+                    AdicionarDocente(onBack = { backStack.removeLastOrNull() }, db = db)
                 }
 
                 else -> NavEntry(Unit) { Text("Unknown route") }
