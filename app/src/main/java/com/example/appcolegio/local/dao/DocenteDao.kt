@@ -1,6 +1,7 @@
 package com.example.appcolegio.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -19,4 +20,7 @@ interface DocenteDao {
 
     @Update
     suspend fun actualizar(bean: Docente)
+
+    @Delete
+    suspend fun eliminar(bean: Docente)
 }
