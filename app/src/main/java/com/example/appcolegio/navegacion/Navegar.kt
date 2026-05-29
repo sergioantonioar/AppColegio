@@ -12,6 +12,7 @@ import com.example.appcolegio.local.AppDatabase
 import com.example.appcolegio.local.entidades.Docente
 import com.example.appcolegio.pantallas.AdicionarCurso
 import com.example.appcolegio.pantallas.AdicionarDocente
+import com.example.appcolegio.pantallas.EditarDocente
 import com.example.appcolegio.pantallas.ListaCurso
 import com.example.appcolegio.pantallas.ListaDocente
 
@@ -20,7 +21,7 @@ data object AddDocente
 data object AddCurso
 data object ListCurso
 
-data class Product(val id: String)
+data class EditDocente(val cod: Int)
 
 @Composable
 fun Navegar() {
@@ -53,7 +54,10 @@ fun Navegar() {
                             backStack.clear()
                             backStack.add(ListCurso)
                         },
-                        db = db
+                        db = db,
+                        datosDocente = {
+                            backStack.add(EditDocente(it))
+                        }
                     )
                 }
 
@@ -68,6 +72,10 @@ fun Navegar() {
                         },
                         db = db
                     )
+                }
+                is EditDocente -> NavEntry(key) {
+                    EditarDocente(onBack = { backStack.removeLastOrNull() }, db = db,
+                        codigo = key.cod)
                 }
 
                 is AddCurso -> NavEntry(key) {

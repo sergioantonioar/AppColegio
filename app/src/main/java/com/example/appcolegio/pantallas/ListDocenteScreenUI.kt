@@ -39,9 +39,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun ListaDocente(
     addDocente: () -> Unit,
-    //onDocente: () -> Unit,
     onCurso: () -> Unit,
-    db: AppDatabase
+    db: AppDatabase,
+    datosDocente: (Int) -> Unit
 ) {
 
     val dao = db.docenteDao()
@@ -72,7 +72,7 @@ fun ListaDocente(
             BottomAppBar {
                 MenuInferior(
                     onDocente = {},
-                    onCurso = {onCurso()}
+                    onCurso = { onCurso() }
                 )
             }
         },
@@ -96,7 +96,8 @@ fun ListaDocente(
             items(lista) { bean ->
                 Card(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    onClick = {datosDocente(bean.codigo)}
                 ) {
                     Column(
                         modifier = Modifier
