@@ -23,4 +23,8 @@ interface DocenteDao {
 
     @Delete
     suspend fun eliminar(bean: Docente)
+
+    @Query("select * from docente where apellidos like :ape || '%'")
+    suspend fun consultaPorApellido(ape: String): List<Docente>
+
 }

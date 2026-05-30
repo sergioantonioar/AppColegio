@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,11 +25,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
@@ -70,6 +73,8 @@ fun ListaDocente(
 
     var docenteActual by remember { mutableStateOf<Docente?>(null) }
 
+    var valorBuscado by remember { mutableStateOf("") }
+
 
     //para se ejecute una sola vez por el composable y no haga cuello de botella
     LaunchedEffect(true) {
@@ -107,80 +112,110 @@ fun ListaDocente(
             }
         }
     ) { espacio ->
-        LazyColumn(
+        Column(
             modifier = Modifier
-                .padding(espacio),
-            contentPadding = PaddingValues(15.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(lista, key = { it.codigo }) { bean ->
+                .fillMaxSize()
+                .padding(espacio)
 
-                val dismissState = remember {
-                    SwipeToDismissBoxState(
-                        initialValue = SwipeToDismissBoxValue.Settled,
-                        positionalThreshold = { it * 0.25f }
+        ) {
+            OutlinedTextField(
+                value = valorBuscado,
+                onValueChange = {
+                    valorBuscado = it
+                    scope.launch {
+                        lista = dao.consultaPorApellido(valorBuscado)
+                    }
+
+                },
+                placeholder = { Text("Ingresar apellido") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(15.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null
                     )
                 }
+            )
 
-                LaunchedEffect(dismissState.currentValue) {
-                    if (
-                        dismissState.currentValue == SwipeToDismissBoxValue.EndToStart ||
-                        dismissState.currentValue == SwipeToDismissBoxValue.StartToEnd
-                    ) {
-                        mostrarDialogo = true
-                        dismissActual = dismissState
-                        docenteActual = bean
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(15.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(lista, key = { it.codigo }) { bean ->
 
+                    val dismissState = remember {
+                        SwipeToDismissBoxState(
+                            initialValue = SwipeToDismissBoxValue.Settled,
+                            positionalThreshold = { it * 0.25f }
+                        )
                     }
-                }
 
-                SwipeToDismissBox(
-                    state = dismissState,
-                    backgroundContent = {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color.Red
-                            )
+                    LaunchedEffect(dismissState.currentValue) {
+                        if (
+                            dismissState.currentValue == SwipeToDismissBoxValue.EndToStart ||
+                            dismissState.currentValue == SwipeToDismissBoxValue.StartToEnd
                         ) {
+                            mostrarDialogo = true
+                            dismissActual = dismissState
+                            docenteActual = bean
 
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(30.dp),
-                                contentAlignment = Alignment.CenterEnd
+                        }
+                    }
+
+                    SwipeToDismissBox(
+                        state = dismissState,
+                        backgroundContent = {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color.Red
+                                )
                             ) {
 
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = null,
-                                    tint = Color.White
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(30.dp),
+                                    contentAlignment = Alignment.CenterEnd
+                                ) {
 
-                                )
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = null,
+                                        tint = Color.White
+
+                                    )
+
+                                }
 
                             }
 
                         }
 
-                    }
-
-                ) {
-
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        onClick = { datosDocente(bean.codigo) }
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(15.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            Text("Codigo: ${bean.codigo}", fontWeight = FontWeight.Bold)
-                            Text("Nombres: ${bean.nombres}")
-                            Text("Apellidos: ${bean.apellidos}")
 
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            onClick = { datosDocente(bean.codigo) }
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .padding(15.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                Text("Codigo: ${bean.codigo}", fontWeight = FontWeight.Bold)
+                                Text("Nombres: ${bean.nombres}")
+                                Text("Apellidos: ${bean.apellidos}")
+
+                            }
                         }
+
+
                     }
 
 
@@ -189,8 +224,8 @@ fun ListaDocente(
 
             }
 
-
         }
+
 
     }
     if (mostrarDialogo) {
