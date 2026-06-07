@@ -12,9 +12,11 @@ import com.example.appcolegio.local.AppDatabase
 import com.example.appcolegio.local.entidades.Docente
 import com.example.appcolegio.pantallas.AdicionarCurso
 import com.example.appcolegio.pantallas.AdicionarDocente
+import com.example.appcolegio.pantallas.AdicionarMenu
 import com.example.appcolegio.pantallas.EditarDocente
 import com.example.appcolegio.pantallas.ListaCurso
 import com.example.appcolegio.pantallas.ListaDocente
+import com.example.appcolegio.pantallas.ListaMenu
 
 data object ListDocente
 data object AddDocente
@@ -23,10 +25,14 @@ data object ListCurso
 
 data class EditDocente(val cod: Int)
 
+data object ListMenu
+data object AddMenu
+
+
 @Composable
 fun Navegar() {
 
-    val backStack = remember { mutableStateListOf<Any>(ListDocente) }
+    val backStack = remember { mutableStateListOf<Any>(ListMenu) }
     val context = LocalContext.current
 
     /* crear bd */
@@ -59,6 +65,13 @@ fun Navegar() {
                             backStack.add(EditDocente(it))
                         }
                     )
+                }
+
+                is ListMenu -> NavEntry(key){
+                    ListaMenu(addMenu = {backStack.add(AddMenu)})
+                }
+                is AddMenu -> NavEntry(key){
+                    AdicionarMenu(onBack = {backStack.removeLastOrNull()})
                 }
 
                 is ListCurso -> NavEntry(key) {
