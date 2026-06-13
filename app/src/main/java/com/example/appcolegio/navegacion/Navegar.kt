@@ -1,5 +1,7 @@
 package com.example.appcolegio.navegacion
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -10,10 +12,12 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.room.Room
 import com.example.appcolegio.local.AppDatabase
 import com.example.appcolegio.local.entidades.Docente
+import com.example.appcolegio.pantallas.AdicionarAlumno
 import com.example.appcolegio.pantallas.AdicionarCurso
 import com.example.appcolegio.pantallas.AdicionarDocente
 import com.example.appcolegio.pantallas.AdicionarMenu
 import com.example.appcolegio.pantallas.EditarDocente
+import com.example.appcolegio.pantallas.ListaAlumno
 import com.example.appcolegio.pantallas.ListaCurso
 import com.example.appcolegio.pantallas.ListaDocente
 import com.example.appcolegio.pantallas.ListaMenu
@@ -28,11 +32,15 @@ data class EditDocente(val cod: Int)
 data object ListMenu
 data object AddMenu
 
+data object ListAlumno
+data object AddAlumno
 
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navegar() {
 
-    val backStack = remember { mutableStateListOf<Any>(ListMenu) }
+    val backStack = remember { mutableStateListOf<Any>(ListAlumno) }
     val context = LocalContext.current
 
     /* crear bd */
@@ -72,6 +80,13 @@ fun Navegar() {
                 }
                 is AddMenu -> NavEntry(key){
                     AdicionarMenu(onBack = {backStack.removeLastOrNull()})
+                }
+
+                is ListAlumno -> NavEntry(key){
+                    ListaAlumno(addAlumno = {backStack.add(AddAlumno)})
+                }
+                is AddAlumno -> NavEntry(key) {
+                    AdicionarAlumno(onBack = { backStack.removeLastOrNull() }) // ← quita el comentario
                 }
 
                 is ListCurso -> NavEntry(key) {

@@ -1,5 +1,6 @@
 package com.example.appcolegio.retrofit
 
+import com.example.appcolegio.retrofit.dao.ApiServiceAlumno
 import com.example.appcolegio.retrofit.dao.ApiServiceMenu
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -18,6 +19,10 @@ object RetrofitCliente {
     //variables
     val menuApi: ApiServiceMenu by lazy {
         retrofit.create(ApiServiceMenu::class.java)
+    }
+
+    val alumnoApi: ApiServiceAlumno by lazy {
+        retrofit.create(ApiServiceAlumno::class.java)
     }
 
 }
