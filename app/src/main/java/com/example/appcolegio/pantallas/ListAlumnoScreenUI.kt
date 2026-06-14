@@ -76,7 +76,7 @@ fun ListaAlumno(
 
     var dismissActual by remember { mutableStateOf<SwipeToDismissBoxState?>(null) }
 
-    var docenteActual by remember { mutableStateOf<Docente?>(null) }
+    var alumnoActual by remember { mutableStateOf<Alumno?>(null) }
 
     var valorBuscado by remember { mutableStateOf("") }
 
@@ -166,7 +166,7 @@ fun ListaAlumno(
                         ) {
                             mostrarDialogo = true
                             dismissActual = dismissState
-                            //docenteActual = bean
+                            alumnoActual = bean
 
                         }
                     }
@@ -267,6 +267,11 @@ fun ListaAlumno(
                 Button(
                     onClick = {
                         scope.launch {
+                            RetrofitCliente.alumnoApi
+                                .eliminarPorCodigo(alumnoActual!!.codigo)
+                            lista = RetrofitCliente.alumnoApi
+                                .listarAlumnos()
+                            mostrarDialogo = false
 
 
 

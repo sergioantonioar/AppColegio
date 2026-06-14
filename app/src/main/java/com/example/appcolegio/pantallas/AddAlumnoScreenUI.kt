@@ -1,6 +1,9 @@
 package com.example.appcolegio.pantallas
 
+import android.net.Uri
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -38,13 +42,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.appcolegio.local.AppDatabase
 import com.example.appcolegio.local.entidades.Docente
+import com.example.appcolegio.retrofit.CloudinaryClient
 import com.example.appcolegio.retrofit.RetrofitCliente
 import com.example.appcolegio.retrofit.entidades.Alumno
 import com.example.appcolegio.retrofit.entidades.Menu
+import com.example.appcolegio.utils.createImageUri
+import com.example.appcolegio.utils.uriToMultipart
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -74,6 +86,19 @@ fun AdicionarAlumno(onBack: () -> Unit) {
     var mostrarDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
 
+    val context = LocalContext.current
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var imageCaptured by remember { mutableStateOf(false) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) {
+        if (it) {
+            imageCaptured = it
+        }
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbar) },
         topBar = {
@@ -94,6 +119,19 @@ fun AdicionarAlumno(onBack: () -> Unit) {
                 onClick = {
                     scope.launch {
                         try {
+                            var urlImagen = ""
+                            if (imageCaptured) {
+                                val part = uriToMultipart(context, imageUri!!)
+                                val params = mutableMapOf<String, RequestBody>()
+                                params["upload_preset"] =
+                                    "alumno_preset".toRequestBody("text/plain".toMediaType())
+                                params["folder"] =
+                                    "alumnos".toRequestBody("text/plain".toMediaType())
+
+                                val response = CloudinaryClient.api.uploadImage(part, params)
+                                urlImagen = response.secure_url
+                            }
+
                             RetrofitCliente.alumnoApi.registrarAlumnos(
                                 Alumno(
                                     codigo = 0,
@@ -103,7 +141,7 @@ fun AdicionarAlumno(onBack: () -> Unit) {
                                     sexo = sexo,
                                     fechaNacimiento = fechaNacimiento,
                                     numeroHermanos = numeroHermanos.toIntOrNull() ?: 0,
-                                    foto = ""
+                                    foto = urlImagen
                                 )
                             )
                             snackbar.showSnackbar("Alumno registrado")
@@ -215,6 +253,28 @@ fun AdicionarAlumno(onBack: () -> Unit) {
                     modifier = Modifier.fillMaxWidth()
                 )
             }
+
+            item {
+                Column {
+                    Button(
+                        onClick = {
+                            val uri = createImageUri(context)
+                            imageUri = uri
+                            launcher.launch(uri)
+                        }
+                    ) {
+                        Text("Tomar Foto")
+                    }
+                    if (imageCaptured && imageUri != null) {
+                        AsyncImage(
+                            model = imageUri,
+                            contentDescription = null,
+                            modifier = Modifier.size(250.dp)
+                        )
+                    }
+                }
+            }
+
         }
     }
 

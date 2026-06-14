@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BottomAppBar
@@ -45,6 +47,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import coil.compose.AsyncImage
 import com.example.appcolegio.navegacion.MenuInferior
 import com.example.appcolegio.retrofit.RetrofitCliente
 import com.example.appcolegio.retrofit.entidades.Menu
@@ -69,7 +72,7 @@ fun ListaMenu(
 
     var dismissActual by remember { mutableStateOf<SwipeToDismissBoxState?>(null) }
 
-    var docenteActual by remember { mutableStateOf<Docente?>(null) }
+    var menuActual by remember { mutableStateOf<Menu?>(null) }
 
     var valorBuscado by remember { mutableStateOf("") }
 
@@ -159,7 +162,7 @@ fun ListaMenu(
                         ) {
                             mostrarDialogo = true
                             dismissActual = dismissState
-                            //docenteActual = bean
+                            menuActual = bean
 
                         }
                     }
@@ -201,15 +204,26 @@ fun ListaMenu(
                                 .fillMaxWidth(),
                             onClick = {  }
                         ) {
-                            Column(
-                                modifier = Modifier
-                                    .padding(15.dp),
-                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(5.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("Codigo: ${bean.codigo}", fontWeight = FontWeight.Bold)
-                                Text("Nombre: ${bean.nombre}")
-                                Text("Precio: ${bean.precio}")
+                                Column(
+                                    modifier = Modifier
+                                        .padding(15.dp),
+                                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    Text("Codigo: ${bean.codigo}", fontWeight = FontWeight.Bold)
+                                    Text("Nombre: ${bean.nombre}")
+                                    Text("Precio: ${bean.precio}")
 
+                                }
+                                AsyncImage(
+                                    model = bean.foto,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(100.dp)
+                                )
                             }
                         }
 
@@ -242,9 +256,11 @@ fun ListaMenu(
                 Button(
                     onClick = {
                         scope.launch {
-
-
-
+                            RetrofitCliente.menuApi.
+                                    eliminarPorCodigo(menuActual!!.codigo)
+                            lista = RetrofitCliente.menuApi.
+                                    listarMenus()
+                            mostrarDialogo = false
                         }
                     }
 
