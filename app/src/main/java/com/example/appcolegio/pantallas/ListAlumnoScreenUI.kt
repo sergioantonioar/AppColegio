@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import com.example.appcolegio.navegacion.EditAlumno
 import com.example.appcolegio.navegacion.MenuInferior
 import com.example.appcolegio.retrofit.RetrofitCliente
 import com.example.appcolegio.retrofit.entidades.Alumno
@@ -62,7 +63,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListaAlumno(
-    addAlumno: () -> Unit
+    addAlumno: () -> Unit,
+    editAlumno: (Int) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
@@ -206,7 +208,7 @@ fun ListaAlumno(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth(),
-                            onClick = {  }
+                            onClick = { editAlumno(bean.codigo) }
                         ) {
                             Row(
                                 modifier = Modifier

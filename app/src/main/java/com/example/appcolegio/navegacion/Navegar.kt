@@ -16,7 +16,9 @@ import com.example.appcolegio.pantallas.AdicionarAlumno
 import com.example.appcolegio.pantallas.AdicionarCurso
 import com.example.appcolegio.pantallas.AdicionarDocente
 import com.example.appcolegio.pantallas.AdicionarMenu
+import com.example.appcolegio.pantallas.EditarAlumno
 import com.example.appcolegio.pantallas.EditarDocente
+import com.example.appcolegio.pantallas.EditarMenu
 import com.example.appcolegio.pantallas.ListaAlumno
 import com.example.appcolegio.pantallas.ListaCurso
 import com.example.appcolegio.pantallas.ListaDocente
@@ -34,6 +36,10 @@ data object AddMenu
 
 data object ListAlumno
 data object AddAlumno
+
+data class EditMenu(val cod: Int)
+
+data class EditAlumno(val cod: Int)
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -76,14 +82,16 @@ fun Navegar() {
                 }
 
                 is ListMenu -> NavEntry(key){
-                    ListaMenu(addMenu = {backStack.add(AddMenu)})
+                    ListaMenu(addMenu = {backStack.add(AddMenu)},
+                        editMenu = { backStack.add(EditMenu(it)) })
                 }
                 is AddMenu -> NavEntry(key){
                     AdicionarMenu(onBack = {backStack.removeLastOrNull()})
                 }
 
                 is ListAlumno -> NavEntry(key){
-                    ListaAlumno(addAlumno = {backStack.add(AddAlumno)})
+                    ListaAlumno(addAlumno = {backStack.add(AddAlumno)},
+                        editAlumno = {backStack.add(EditAlumno(it))})
                 }
                 is AddAlumno -> NavEntry(key) {
                     AdicionarAlumno(onBack = { backStack.removeLastOrNull() }) // ← quita el comentario
@@ -103,6 +111,16 @@ fun Navegar() {
                 }
                 is EditDocente -> NavEntry(key) {
                     EditarDocente(onBack = { backStack.removeLastOrNull() }, db = db,
+                        codigo = key.cod)
+                }
+
+                is EditMenu -> NavEntry(key) {
+                    EditarMenu(onBack = { backStack.removeLastOrNull() },
+                        codigo = key.cod)
+                }
+
+                is EditAlumno -> NavEntry(key) {
+                    EditarAlumno(onBack = { backStack.removeLastOrNull() },
                         codigo = key.cod)
                 }
 

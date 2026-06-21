@@ -58,7 +58,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListaMenu(
-    addMenu: () -> Unit
+    addMenu: () -> Unit,
+    editMenu: (Int) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
@@ -202,7 +203,7 @@ fun ListaMenu(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth(),
-                            onClick = {  }
+                            onClick = { editMenu(bean.codigo) }
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(5.dp),
