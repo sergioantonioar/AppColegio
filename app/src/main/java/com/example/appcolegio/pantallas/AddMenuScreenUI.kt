@@ -40,13 +40,16 @@ import com.example.appcolegio.local.AppDatabase
 import com.example.appcolegio.local.entidades.Docente
 import com.example.appcolegio.retrofit.CloudinaryClient
 import com.example.appcolegio.retrofit.RetrofitCliente
+import com.example.appcolegio.retrofit.entidades.ErrorResponse
 import com.example.appcolegio.retrofit.entidades.Menu
 import com.example.appcolegio.utils.createImageUri
 import com.example.appcolegio.utils.uriToMultipart
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.HttpException
 
 
 //01:13:24
@@ -61,8 +64,8 @@ fun AdicionarMenu(onBack: () -> Unit) {
     val snackbar = remember { SnackbarHostState() }
 
     var nombre by remember { mutableStateOf("") }
-    var precio by remember { mutableStateOf("") }
-    var stock by remember { mutableStateOf("") }
+    var precio by remember { mutableStateOf("0.0") }
+    var stock by remember { mutableStateOf("0") }
     val categorias = listOf(
         "Entradas",
         "Platos de Fondo",
@@ -223,15 +226,15 @@ fun AdicionarMenu(onBack: () -> Unit) {
                         scope.launch {
                             try {
                                 var urlImagen = ""
-                                if(imageCaptured){
-                                    val part = uriToMultipart(context,imageUri!!)
+                                if (imageCaptured) {
+                                    val part = uriToMultipart(context, imageUri!!)
                                     val params = mutableMapOf<String, RequestBody>()
                                     params["upload_preset"] =
                                         "menu_preset".toRequestBody("text/plain".toMediaType())
                                     params["folder"] =
                                         "menus".toRequestBody("text/plain".toMediaType())
 
-                                    val response = CloudinaryClient.api.uploadImage(part,params)
+                                    val response = CloudinaryClient.api.uploadImage(part, params)
                                     urlImagen = response.secure_url
                                 }
 
@@ -246,9 +249,32 @@ fun AdicionarMenu(onBack: () -> Unit) {
                                         urlImagen
                                     )
                                 )
-                                snackbar.showSnackbar("Docente registrado")
-                            } catch (e: Exception) {
-                                snackbar.showSnackbar("Error> ${e.message}")
+                                snackbar.showSnackbar("Menu registrado")
+                            } catch (e: HttpException) {
+                                val errorBody = e.response()?.errorBody()?.string()
+                                var mensaje = ""
+                                try {
+                                    val errorResponse = Gson().fromJson(
+                                        errorBody, ErrorResponse::class.java
+                                    )
+                                    // Caso 1: validaciones (data != null)
+                                    if (!errorResponse.data.isNullOrEmpty()) {
+                                        val validaciones = buildString {
+                                            append(errorResponse.mensaje)
+                                            append("\n\n")
+                                            errorResponse.data.forEach { (clave, mensaje) ->
+                                                append("• $clave : $mensaje\n")
+                                            }
+                                        }
+                                        mensaje = validaciones
+                                    } else {
+                                        // Caso 2: error simple (ej: nombre existe)
+                                        mensaje = errorResponse.mensaje
+                                    }
+                                } catch (ex: Exception) {
+                                    e.message()
+                                }
+                                snackbar.showSnackbar("" + mensaje)
                             }
                         }
                     },

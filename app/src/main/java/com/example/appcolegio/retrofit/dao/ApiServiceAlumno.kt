@@ -1,6 +1,7 @@
 package com.example.appcolegio.retrofit.dao
 
 import com.example.appcolegio.retrofit.entidades.Alumno
+import com.example.appcolegio.retrofit.entidades.AlumnoResponse
 import com.example.appcolegio.retrofit.entidades.Menu
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -11,18 +12,18 @@ import retrofit2.http.Path
 
 interface ApiServiceAlumno {
 
-    @GET("/alumno/lista")
-    suspend fun listarAlumnos(): List<Alumno>
+    @GET("/alu/lista")
+    suspend fun listarAlumnos(): AlumnoResponse<List<Alumno>>
 
-    @GET("/alumno/buscar/{cod}")
-    suspend fun buscarPorCodigo(@Path("cod") codi: Int): Alumno
+    @GET("/alu/buscar/{cod}")
+    suspend fun buscarPorCodigo(@Path("cod") codi: Int): AlumnoResponse<Alumno>
 
-    @POST("/alumno/registrar")
-    suspend fun registrarAlumnos(@Body bean: Alumno)
+    @POST("/alu/registrar")
+    suspend fun registrarAlumnos(@Body bean: Alumno): AlumnoResponse<Alumno>
 
-    @PUT("/alumno/actualizar")
-    suspend fun actualizarAlumnos(@Body bean: Alumno)
+    @PUT("/alu/actualizar")
+    suspend fun actualizarAlumnos(@Body bean: Alumno): AlumnoResponse<Alumno>
 
-    @DELETE("/alumno/eliminar/{codigo}")
+    @DELETE("/alu/eliminar/{codigo}")
     suspend fun eliminarPorCodigo(@Path("codigo") cod: Int): Unit
 }

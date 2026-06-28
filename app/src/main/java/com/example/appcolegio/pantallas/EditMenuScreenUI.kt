@@ -41,13 +41,18 @@ import com.example.appcolegio.local.AppDatabase
 import com.example.appcolegio.local.entidades.Docente
 import com.example.appcolegio.retrofit.CloudinaryClient
 import com.example.appcolegio.retrofit.RetrofitCliente
+import com.example.appcolegio.retrofit.entidades.ErrorResponse
 import com.example.appcolegio.retrofit.entidades.Menu
 import com.example.appcolegio.utils.createImageUri
 import com.example.appcolegio.utils.uriToMultipart
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.HttpException
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 
 //01:13:24
@@ -101,7 +106,7 @@ fun EditarMenu(onBack: () -> Unit, codigo: Int) {
 
     var datos by remember { mutableStateOf<Menu?>(null) }
     LaunchedEffect(true) {
-        datos = RetrofitCliente.menuApi.buscarPorCodigo(codigo)
+        datos = RetrofitCliente.menuApi.buscarPorCodigo(codigo).data
         datos?.let {
             nombre = it.nombre
             precio = it.precio.toString()
@@ -259,8 +264,31 @@ fun EditarMenu(onBack: () -> Unit, codigo: Int) {
                                     )
                                 )
                                 snackbar.showSnackbar("Menu actualizado")
-                            } catch (e: Exception) {
-                                snackbar.showSnackbar("Error> ${e.message}")
+                            } catch (e: HttpException) {
+                                val errorBody = e.response()?.errorBody()?.string()
+                                var mensaje = ""
+                                try {
+                                    val errorResponse = Gson().fromJson(
+                                        errorBody, ErrorResponse::class.java
+                                    )
+                                    // Caso 1: validaciones (data != null)
+                                    if (!errorResponse.data.isNullOrEmpty()) {
+                                        val validaciones = buildString {
+                                            append(errorResponse.mensaje)
+                                            append("\n\n")
+                                            errorResponse.data.forEach { (clave, mensaje) ->
+                                                append("• $clave : $mensaje\n")
+                                            }
+                                        }
+                                        mensaje = validaciones
+                                    } else {
+                                        // Caso 2: error simple (ej: nombre existe)
+                                        mensaje = errorResponse.mensaje
+                                    }
+                                } catch (ex: Exception) {
+                                    e.message()
+                                }
+                                snackbar.showSnackbar("" + mensaje)
                             }
                         }
                     },

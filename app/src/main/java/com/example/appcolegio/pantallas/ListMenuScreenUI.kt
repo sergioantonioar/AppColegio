@@ -81,7 +81,7 @@ fun ListaMenu(
     //para se ejecute una sola vez por el composable y no haga cuello de botella
     LaunchedEffect(true) {
         scope.launch {
-            lista = RetrofitCliente.menuApi.listarMenus()
+            lista = RetrofitCliente.menuApi.listarMenus().data
         }
     }
 
@@ -260,7 +260,7 @@ fun ListaMenu(
                             RetrofitCliente.menuApi.
                                     eliminarPorCodigo(menuActual!!.codigo)
                             lista = RetrofitCliente.menuApi.
-                                    listarMenus()
+                                    listarMenus().data
                             mostrarDialogo = false
                         }
                     }

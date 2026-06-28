@@ -86,7 +86,7 @@ fun ListaAlumno(
     //para se ejecute una sola vez por el composable y no haga cuello de botella
     LaunchedEffect(true) {
         scope.launch {
-            lista = RetrofitCliente.alumnoApi.listarAlumnos()
+            lista = RetrofitCliente.alumnoApi.listarAlumnos().data
         }
     }
 
@@ -272,7 +272,7 @@ fun ListaAlumno(
                             RetrofitCliente.alumnoApi
                                 .eliminarPorCodigo(alumnoActual!!.codigo)
                             lista = RetrofitCliente.alumnoApi
-                                .listarAlumnos()
+                                .listarAlumnos().data
                             mostrarDialogo = false
 
 
