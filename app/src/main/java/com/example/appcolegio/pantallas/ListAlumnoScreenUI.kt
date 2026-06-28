@@ -262,7 +262,7 @@ fun ListaAlumno(
                 Text("Confirmación")
             },
             text = {
-                Text("¿Seguro de eliminar el docente?")
+                Text("¿Seguro de eliminar el alumno?")
             },
 
             confirmButton = {
