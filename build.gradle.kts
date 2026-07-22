@@ -5,4 +5,7 @@ plugins {
 //    alias(libs.plugins.jetbrains.kotlin.serialization) apply false
 //    alias(libs.plugins.ksp) apply false
     id("com.google.devtools.ksp") version "2.0.21-1.0.27" apply false
+
+    // Add the dependency for the Google services Gradle plugin
+    id("com.google.gms.google-services") version "4.5.0" apply false
 }

@@ -5,6 +5,9 @@ plugins {
 //    alias(libs.plugins.jetbrains.kotlin.serialization)
 //    alias(libs.plugins.ksp)
     id("com.google.devtools.ksp")
+
+    // Add the Google services Gradle plugin
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -80,8 +83,10 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     //permite comunicarse con proyecto en firebase
-    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.16.0"))
+    //permite conectar con la bd en firebase
     implementation("com.google.firebase:firebase-firestore")
+    //para usar el await
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
 
 }
