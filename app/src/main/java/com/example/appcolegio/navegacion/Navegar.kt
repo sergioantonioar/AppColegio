@@ -15,6 +15,7 @@ import com.example.appcolegio.local.entidades.Docente
 import com.example.appcolegio.pantallas.AdicionarAlumno
 import com.example.appcolegio.pantallas.AdicionarCurso
 import com.example.appcolegio.pantallas.AdicionarDocente
+import com.example.appcolegio.pantallas.AdicionarLibro
 import com.example.appcolegio.pantallas.AdicionarMenu
 import com.example.appcolegio.pantallas.EditarAlumno
 import com.example.appcolegio.pantallas.EditarDocente
@@ -23,6 +24,7 @@ import com.example.appcolegio.pantallas.ListaAlumno
 import com.example.appcolegio.pantallas.ListaCurso
 import com.example.appcolegio.pantallas.ListaDocente
 import com.example.appcolegio.pantallas.ListaMenu
+import com.example.appcolegio.pantallas.pantallaLibros
 
 data object ListDocente
 data object AddDocente
@@ -36,6 +38,8 @@ data object AddMenu
 
 data object ListAlumno
 data object AddAlumno
+data object ListLibro
+data object AddLibro
 
 data class EditMenu(val cod: Int)
 
@@ -46,7 +50,7 @@ data class EditAlumno(val cod: Int)
 @Composable
 fun Navegar() {
 
-    val backStack = remember { mutableStateListOf<Any>(ListAlumno) }
+    val backStack = remember { mutableStateListOf<Any>(ListLibro) }
     val context = LocalContext.current
 
     /* crear bd */
@@ -87,6 +91,14 @@ fun Navegar() {
                 }
                 is AddMenu -> NavEntry(key){
                     AdicionarMenu(onBack = {backStack.removeLastOrNull()})
+                }
+
+                is ListLibro -> NavEntry(key){
+                    pantallaLibros(addLibro = {backStack.add(AddLibro)})
+                }
+
+                is AddLibro -> NavEntry(key){
+                    AdicionarLibro(onBack = {backStack.removeLastOrNull()})
                 }
 
                 is ListAlumno -> NavEntry(key){
