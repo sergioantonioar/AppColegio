@@ -69,7 +69,7 @@ import com.example.appcolegio.retrofit.entidades.Menu
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun pantallaLibros(addLibro:()-> Unit) {
+fun pantallaLibros(addLibro:()-> Unit, EditarLibro:(isbn: String)-> Unit) {
 
 
     val scope = rememberCoroutineScope()
@@ -78,7 +78,7 @@ fun pantallaLibros(addLibro:()-> Unit) {
     var mostrarDialogo by remember {
         mutableStateOf(false)
     }
-    var docenteEliminar by remember {
+    var libroEliminar by remember {
         mutableStateOf<Libro?>(null)
     }
     var dismissActual by remember {
@@ -216,7 +216,7 @@ fun pantallaLibros(addLibro:()-> Unit) {
                             dismissState.currentValue == SwipeToDismissBoxValue.StartToEnd
                         ) {
 
-                            docenteEliminar = bean
+                            libroEliminar = bean
                             mostrarDialogo = true
                             dismissActual = dismissState
                         }
@@ -257,7 +257,7 @@ fun pantallaLibros(addLibro:()-> Unit) {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
-                                
+                                EditarLibro(bean.isbn)
                             }
                         ) {
                             Row(
@@ -308,8 +308,7 @@ fun pantallaLibros(addLibro:()-> Unit) {
                             onClick = {
 
                                 scope.launch {
-
-                                   
+                                    viewLib.deleteByIsbn(libroEliminar!!.isbn)
                                     mostrarDialogo = false
                                 }
                             }

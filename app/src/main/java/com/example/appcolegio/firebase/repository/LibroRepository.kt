@@ -35,4 +35,42 @@ class LibroRepository {
         }
     }
 
+    suspend fun buscarLibro(isbn: String): Result<Libro?> {
+        try {
+            val documentos = db.collection("libros")
+                .document(isbn)
+                .get()
+                .await()
+            val lista = documentos.toObject(Libro::class.java)
+            return Result.success(lista)
+        }
+        catch (e: Exception) {
+            return Result.failure(e)
+        }
+    }
+
+    suspend fun actualizarLibro(bean: Libro): Result<Unit> {
+        try {
+            db.collection("libros")
+                .document(bean.isbn)
+                .set(bean)
+                .await()
+            return Result.success(Unit)
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+    }
+
+    suspend fun eliminarLibro(isbn: String): Result<Unit> {
+        try {
+            db.collection("libros")
+                .document(isbn)
+                .delete()
+                .await()
+            return Result.success(Unit)
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+    }
+
 }

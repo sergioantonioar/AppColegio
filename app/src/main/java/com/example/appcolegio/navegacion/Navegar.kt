@@ -19,6 +19,7 @@ import com.example.appcolegio.pantallas.AdicionarLibro
 import com.example.appcolegio.pantallas.AdicionarMenu
 import com.example.appcolegio.pantallas.EditarAlumno
 import com.example.appcolegio.pantallas.EditarDocente
+import com.example.appcolegio.pantallas.EditarLibro
 import com.example.appcolegio.pantallas.EditarMenu
 import com.example.appcolegio.pantallas.ListaAlumno
 import com.example.appcolegio.pantallas.ListaCurso
@@ -40,6 +41,7 @@ data object ListAlumno
 data object AddAlumno
 data object ListLibro
 data object AddLibro
+data class EditLibro(val isbn: String)
 
 data class EditMenu(val cod: Int)
 
@@ -94,7 +96,13 @@ fun Navegar() {
                 }
 
                 is ListLibro -> NavEntry(key){
-                    pantallaLibros(addLibro = {backStack.add(AddLibro)})
+                    pantallaLibros(addLibro = {backStack.add(AddLibro)},
+                        EditarLibro={backStack.add(EditLibro(it))})
+                }
+
+                is EditLibro -> NavEntry(key) {
+                    EditarLibro(onBack = { backStack.removeLastOrNull() },
+                        isbn = key.isbn)
                 }
 
                 is AddLibro -> NavEntry(key){

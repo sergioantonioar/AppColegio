@@ -22,6 +22,9 @@ class LibroViewModel : ViewModel() {
 
     val libros: StateFlow<List<Libro>> = _libros
 
+    private val _libro = MutableStateFlow<Libro?>(null)
+    val libro: StateFlow<Libro?> = _libro
+
     fun save(lib: Libro) {
         //couritine por defecto de viewmodel
         viewModelScope.launch {
@@ -40,6 +43,43 @@ class LibroViewModel : ViewModel() {
             repo.listarLibros()
                 .onSuccess {
                     _libros.value = it
+                }
+                .onFailure {
+                    _mensaje.value = it.message
+                }
+        }
+    }
+
+    fun findByIsbn(isbn: String) {
+        viewModelScope.launch {
+            repo.buscarLibro(isbn)
+                .onSuccess {
+                    _libro.value = it
+                }
+                .onFailure {
+                    _mensaje.value = it.message
+                }
+        }
+    }
+
+    fun update(lib: Libro) {
+        viewModelScope.launch {
+            repo.actualizarLibro(lib)
+                .onSuccess {
+                    _mensaje.value = "Libro actualizado"
+                }
+                .onFailure {
+                    _mensaje.value = it.message
+                }
+        }
+    }
+
+    fun deleteByIsbn(isbn: String) {
+        viewModelScope.launch {
+            repo.eliminarLibro(isbn)
+                .onSuccess {
+                    _mensaje.value = "Libro eliminado"
+                    findAll() //para actualizar lista
                 }
                 .onFailure {
                     _mensaje.value = it.message
